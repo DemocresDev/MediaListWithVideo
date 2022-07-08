@@ -8,15 +8,15 @@
 import Foundation
 import SwiftKeychainWrapper
 import Combine
+import JWTDecode
 
 class APIClient {
     
     static var shared: APIClient = {
         let instance = APIClient()
-        KeychainWrapper.standard.remove(forKey: "sessionKey")
-        KeychainWrapper.standard.remove(forKey: "tokeyType")
         instance.sessionToken = KeychainWrapper.standard.string(forKey: "sessionKey") ?? ""
         instance.tokeyType = KeychainWrapper.standard.string(forKey: "tokeyType") ?? ""
+        instance.refreshSessionToken()
         return instance
     }()
     
@@ -56,7 +56,7 @@ class APIClient {
             .eraseToAnyPublisher()
     }
     
-    public func refreshSessionToken() {
+    public func fetchSessionToken() {
         
         let emptyToken = POSTTokenResponse(sub: "", token: "", type: "")
         guard let request = createRequestWithURLComponents(requestType: .getToken) else { return }
@@ -75,5 +75,14 @@ class APIClient {
                 self?.sessionToken = tokenResponse.token
                 self?.tokeyType = tokenResponse.type
             }.store(in: &disposables)
+    }
+    
+    private func refreshSessionToken() {
+        
+        guard let jwt = try? decode(jwt: sessionToken),
+              !jwt.expired else {
+            self.fetchSessionToken()
+            return
+        }
     }
 }

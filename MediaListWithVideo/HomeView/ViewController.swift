@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import AVKit
 
 class ViewController: UIViewController {
 
@@ -90,7 +91,22 @@ extension ViewController: UICollectionViewDataSource {
 extension ViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        print(indexPath)
+        var videoUrlString = ""
+        if collectionView == thumbsCollectionView {
+            videoUrlString = viewModel.thumbs[indexPath.row].videoUrl ?? ""
+        } else if collectionView == postersCollectionView {
+            videoUrlString = viewModel.posters[indexPath.row].videoUrl ?? ""
+        }
+        
+        let videoURL = URL(string: videoUrlString)
+        let player = AVPlayer(url: videoURL!)
+        let playerViewController = AVPlayerViewController()
+        playerViewController.player = player
+        DispatchQueue.main.async {
+            self.present(playerViewController, animated: true) {
+                playerViewController.player!.play()
+            }
+        }
     }
 }
 

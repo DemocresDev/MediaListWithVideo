@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import JWTDecode
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -37,23 +36,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
-        refreshSessionToken()
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
-    }
-
-    private func refreshSessionToken() {
-        let apiClient = APIClient.shared
-
-        guard let jwt = try? decode(jwt: apiClient.sessionToken),
-              !jwt.expired else {    
-            apiClient.refreshSessionToken()
-            return
-        }
     }
 }
 
