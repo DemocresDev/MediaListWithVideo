@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MoviePosterCell" id="gTV-IL-0wX" customClass="MoviePosterCell" customModule="MediaListWithVideo" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="429" height="261"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="429" height="261"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="A0n-DU-ImB">
+                        <rect key="frame" x="8" y="8" width="413" height="204"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="204" id="WrE-f9-flW"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hsi-8Q-Xjk">
+                        <rect key="frame" x="8" y="220" width="413" height="21"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="eF2-gq-ayS"/>
+                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="21" id="gk0-Cm-xcT"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+            </view>
+            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <constraints>
+                <constraint firstItem="A0n-DU-ImB" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" constant="8" id="IFX-8R-whX"/>
+                <constraint firstAttribute="trailing" secondItem="hsi-8Q-Xjk" secondAttribute="trailing" constant="8" id="Umg-0f-gQK"/>
+                <constraint firstAttribute="trailing" secondItem="A0n-DU-ImB" secondAttribute="trailing" constant="8" id="dCW-ik-FWd"/>
+                <constraint firstItem="hsi-8Q-Xjk" firstAttribute="top" secondItem="A0n-DU-ImB" secondAttribute="bottom" constant="8" id="r54-No-0Y7"/>
+                <constraint firstItem="A0n-DU-ImB" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" constant="8" id="tmI-S9-kdn"/>
+                <constraint firstItem="hsi-8Q-Xjk" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" constant="8" id="ypB-Kd-OkY"/>
+            </constraints>
+            <size key="customSize" width="429" height="261"/>
+            <connections>
+                <outlet property="posterImage" destination="A0n-DU-ImB" id="Fwr-SG-PWo"/>
+                <outlet property="titleLabel" destination="hsi-8Q-Xjk" id="Vzk-XV-XuG"/>
+            </connections>
+            <point key="canvasLocation" x="429.71014492753625" y="73.325892857142847"/>
+        </collectionViewCell>
+    </objects>
+</document>
