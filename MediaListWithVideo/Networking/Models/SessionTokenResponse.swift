@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct POSTTokenResponse: Codable {
+struct SessionTokenResponse: Codable {
     var sub: String
     var token: String
     var type: String

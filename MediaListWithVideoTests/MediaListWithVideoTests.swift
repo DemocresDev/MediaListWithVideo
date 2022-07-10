@@ -6,28 +6,39 @@
 //
 
 import XCTest
+import Combine
 @testable import MediaListWithVideo
 
 class MediaListWithVideoTests: XCTestCase {
-
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    
+    func testViewModelDataFetch() {
+        let sut = ViewModel()
+        var disposables = Set<AnyCancellable>()
+        
+        sut.fetchMovies()
+        
+        let expectation = expectation(description: "fetchData")
+        sut.$dataLoaded.sink { isDataLoaded in
+            if isDataLoaded {
+                XCTAssertGreaterThan(sut.thumbs.count, 0)
+                XCTAssertGreaterThan(sut.posters.count, 0)
+            }
+            expectation.fulfill()
+        }.store(in: &disposables)
+        
+        waitForExpectations(timeout: 2)
     }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+    
+    func testAPIClientToken() {
+        let sut = APIClient()
+        let expectation = expectation(description: "fetchToken")
+        
+        sut.fetchSessionToken()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            XCTAssertFalse(sut.sessionToken.isEmpty)
+            expectation.fulfill()
         }
-    }
 
+        waitForExpectations(timeout: 2)
+    }
 }

@@ -10,7 +10,14 @@ import SwiftKeychainWrapper
 import Combine
 import JWTDecode
 
-class APIClient {
+protocol APIClientProtocol: AnyObject {
+    var sessionToken: String { get set }
+    var tokeyType: String { get set }
+    func createRequest<T:Codable>(responseModel: T.Type, requestType: RequestType) -> AnyPublisher<T, Error> 
+    func sendRequest<T:Codable>(model: T.Type, request: URLRequest) -> AnyPublisher<T, Error>
+}
+
+final class APIClient: APIClientProtocol {
     
     static var shared: APIClient = {
         let instance = APIClient()
@@ -25,8 +32,7 @@ class APIClient {
     private var request: URLRequest?
     private var disposables = Set<AnyCancellable>()
     
-    func createRequestWithURLComponents(requestType: RequestType) -> URLRequest? {
-        
+    func createRequest<T:Codable>(responseModel: T.Type, requestType: RequestType) -> AnyPublisher<T, Error> {
         var components = URLComponents(string: requestType.absoluteString)!
 
         components.queryItems = requestType.parameters
@@ -41,7 +47,11 @@ class APIClient {
                 request?.addValue(header, forHTTPHeaderField: value)
             }
         }
-        return request
+        if let request = request {
+            return sendRequest(model: responseModel, request: request)
+        }
+        
+        return Fail(error: NSError(domain: "Error Creating Request", code: -1)).eraseToAnyPublisher()
     }
     
     func sendRequest<T:Codable>(model: T.Type, request: URLRequest) -> AnyPublisher<T, Error> {
@@ -58,29 +68,31 @@ class APIClient {
     
     public func fetchSessionToken() {
         
-        let emptyToken = POSTTokenResponse(sub: "", token: "", type: "")
-        guard let request = createRequestWithURLComponents(requestType: .getToken) else { return }
-        
-        sendRequest(model: POSTTokenResponse.self, request: request)
-            .catch({ error -> AnyPublisher<POSTTokenResponse, Never> in
-                print("Handle Error: " + error.localizedDescription)
-                return Just(emptyToken).eraseToAnyPublisher()
-            }).sink { [weak self] tokenResponse in
-                KeychainWrapper.standard.remove(forKey: "sessionKey")
-                KeychainWrapper.standard.set(tokenResponse.token, forKey: "sessionKey")
+        createRequest(responseModel: SessionTokenResponse.self, requestType: .getToken)
+        .catch({ error -> AnyPublisher<SessionTokenResponse, Never> in
+            print("Handle Error: " + error.localizedDescription)
+            return Just(SessionTokenResponse(sub: "", token: "", type: "")).eraseToAnyPublisher()
+        }).sink { [weak self] tokenResponse in
+            KeychainWrapper.standard.remove(forKey: "sessionKey")
+            KeychainWrapper.standard.set(tokenResponse.token, forKey: "sessionKey")
 
-                KeychainWrapper.standard.remove(forKey: "tokeyType")
-                KeychainWrapper.standard.set(tokenResponse.type, forKey: "tokeyType")
-                
-                self?.sessionToken = tokenResponse.token
-                self?.tokeyType = tokenResponse.type
-            }.store(in: &disposables)
+            KeychainWrapper.standard.remove(forKey: "tokeyType")
+            KeychainWrapper.standard.set(tokenResponse.type, forKey: "tokeyType")
+            
+            self?.sessionToken = tokenResponse.token
+            self?.tokeyType = tokenResponse.type
+        }.store(in: &disposables)
     }
     
     private func refreshSessionToken() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
         
         guard let jwt = try? decode(jwt: sessionToken),
-              !jwt.expired else {
+              let expDateString = jwt.body["expireDate"] as? String,
+              let expDate = dateFormatter.date(from: expDateString),
+              expDate > Date() else {
             self.fetchSessionToken()
             return
         }

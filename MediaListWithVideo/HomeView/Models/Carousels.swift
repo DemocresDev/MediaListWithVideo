@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct GETCarousels: Codable {
+struct Carousels: Codable {
     var title: String
     var type: String
     var items: [Movie]
